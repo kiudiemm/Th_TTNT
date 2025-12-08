@@ -1,2 +1,2 @@
-# TH-Tr-Tu-Nh-n-T-o
+#TH_TTNT
 Thực hành trí tuệ nhân tạo TT2
