@@ -44,18 +44,18 @@ def result(board: List[List[Optional[str]]], action: Tuple[int, int]) -> List[Li
     return new_board
 
 
-def _get_horizontal_winner(board):
+def _get_horizontal_winner(board):#kiểm tra thắng theo hàng
     n = len(board)
     for i in range(n):
         candidate = board[i][0]
         if candidate is None:
             continue
-        if all(board[i][j] == candidate for j in range(n)):
+        if all(board[i][j] == candidate for j in range(n)):#
             return candidate
     return None
 
 
-def _get_vertical_winner(board):
+def _get_vertical_winner(board):#kiểm tra thắng theo cột
     n = len(board)
     for j in range(n):
         candidate = board[0][j]
@@ -66,23 +66,23 @@ def _get_vertical_winner(board):
     return None
 
 
-def _get_diagonal_winner(board):
+def _get_diagonal_winner(board):#kiểm tra thắng theo đường chéo
     n = len(board)
     candidate = board[0][0]
-    if candidate is not None and all(board[i][i] == candidate for i in range(n)):
+    if candidate is not None and all(board[i][i] == candidate for i in range(n)):#kiểm tra đường chéo chính
         return candidate
     candidate = board[0][n - 1]
-    if candidate is not None and all(board[i][n - 1 - i] == candidate for i in range(n)):
+    if candidate is not None and all(board[i][n - 1 - i] == candidate for i in range(n)):#kiểm tra đường chéo phụ
         return candidate
     return None
 
 
-def winner(board):
+def winner(board):#kiểm tra thắng
     """Trả về người thắng nếu có, ngược lại None."""
     return (
-        _get_horizontal_winner(board)
-        or _get_vertical_winner(board)
-        or _get_diagonal_winner(board)
+        _get_horizontal_winner(board)#kiểm tra thắng theo hàng
+        or _get_vertical_winner(board)#kiểm tra thắng theo cột
+        or _get_diagonal_winner(board)#kiểm tra thắng theo đường chéo
         or None
     )
 
@@ -104,21 +104,21 @@ def utility(board) -> int:
     return 0
 
 
-def max_value(state):
-    if terminal(state):
+def max_value(state):#giá trị tối đa
+    if terminal(state):#kiểm tra trạng thái kết thúc
         return utility(state)
     v = -math.inf
     for act in actions(state):
-        v = max(v, min_value(result(state, act)))
+        v = max(v, min_value(result(state, act)))#gọi hàm min_value để tìm giá trị tối thiểu
     return v
 
 
-def min_value(state):
+def min_value(state):#giá trị tối thiểu
     if terminal(state):
         return utility(state)
     v = math.inf
     for act in actions(state):
-        v = min(v, max_value(result(state, act)))
+        v = min(v, max_value(result(state, act)))#gọi hàm max_value để tìm giá trị tối đa
     return v
 
 
@@ -131,14 +131,14 @@ def minimax(board):
         best_score = -math.inf
         for act in actions(board):
             score = min_value(result(board, act))
-            if score > best_score:
+            if score > best_score:#nếu giá trị tối thiểu lớn hơn giá trị tối đa thì cập nhật giá trị tối đa
                 best_score = score
                 best_move = act
     else:
         best_score = math.inf
         for act in actions(board):
             score = max_value(result(board, act))
-            if score < best_score:
+            if score < best_score:#nếu giá trị tối đa nhỏ hơn giá trị tối thiểu thì cập nhật giá trị tối thiểu
                 best_score = score
                 best_move = act
     return best_move
@@ -152,10 +152,56 @@ def _prompt_int(msg: str) -> int:
             print("Vui lòng nhập số nguyên.")
 
 
+def input_board(n: int) -> List[List[Optional[str]]]:
+    """Nhập ma trận n×n từ console."""
+    print(f"\nNhập ma trận {n}×{n} (X, O, hoặc rỗng để bỏ qua):")
+    print("Ví dụ: X O None hoặc X O _")
+    board = initial_state(n)
+    
+    for i in range(n):
+        while True:
+            row_input = input(f"Hàng {i} (cách nhau bởi dấu cách): ").strip().split()
+            if len(row_input) != n:
+                print(f"Vui lòng nhập đúng {n} giá trị.")
+                continue
+            
+            valid = True
+            for j, val in enumerate(row_input):
+                val_upper = val.upper()
+                if val_upper == "X":
+                    board[i][j] = X
+                elif val_upper == "O":
+                    board[i][j] = O
+                elif val_upper in ["NONE", "_", "", "EMPTY"]:
+                    board[i][j] = EMPTY
+                else:
+                    print(f"Giá trị '{val}' không hợp lệ. Chỉ chấp nhận X, O, None, _, hoặc rỗng.")
+                    valid = False
+                    break
+            
+            if valid:
+                break
+    
+    print("\nMa trận đã nhập:")
+    for row in board:
+        print(row)
+    
+    return board
+
+
 def main():
     global user, ai
     n = _prompt_int("Nhập kích thước bàn cờ n (mặc định 3): ") or 3
-    board = initial_state(n)
+    if n < 3:
+        print("Kích thước tối thiểu là 3. Sử dụng n=3.")
+        n = 3
+    
+    choice = input("\nChọn:\n1. Nhập ma trận ban đầu\n2. Bắt đầu từ bàn cờ trống\nLựa chọn (1/2, mặc định 2): ").strip()
+    
+    if choice == "1":
+        board = input_board(n)
+    else:
+        board = initial_state(n)
 
     print("Chọn quân của bạn (X/O), X đi trước:")
     user = input().strip().upper() or X
