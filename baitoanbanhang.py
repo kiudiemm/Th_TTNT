@@ -1,9 +1,3 @@
-"""Thuật toán Held-Karp (quy hoạch động) cho bài toán người bán hàng.
-
-Usage:
-    python tsp_held_karp.py --input path/to/matrix.txt --start 0
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -12,30 +6,30 @@ from typing import List, Sequence, Tuple
 
 from graph_io import read_adjacency_matrix
 
-
+#thuật toán help_karp cho bài toán bán hàng
 def held_karp(matrix: Sequence[Sequence[float]], start: int = 0) -> Tuple[float, List[int]]:
-    n = len(matrix)
-    all_vertices = tuple(v for v in range(n) if v != start)
+    n = len(matrix) #số thành phố
+    all_vertices = tuple(v for v in range(n) if v != start) #tập những đỉnh chưa thăm
 
     @lru_cache(maxsize=None)
-    def visit(current: int, remaining: Tuple[int, ...]) -> Tuple[float, Tuple[int, ...]]:
-        if not remaining:
-            return matrix[current][start], (start,)
+    def visit(current: int, remaining: Tuple[int, ...]) -> Tuple[float, Tuple[int, ...]]:#hàm đệ quy tìm kiếm tối ưu
+        if not remaining:#nếu không còn đỉnh chưa thăm
+            return matrix[current][start], (start,) #quay về điểm xuất phát
 
-        best_cost = float("inf")
-        best_path: Tuple[int, ...] = ()
-        for i, nxt in enumerate(remaining):
-            cost_to_next = matrix[current][nxt]
-            if cost_to_next == float("inf"):
-                continue
-            cost_rest, path_rest = visit(nxt, remaining[:i] + remaining[i + 1 :])
-            total_cost = cost_to_next + cost_rest
-            if total_cost < best_cost:
+        best_cost = float("inf") #chi phí tối thiểu
+        best_path: Tuple[int, ...] = () #chu trình tối ưu
+        for i, nxt in enumerate(remaining):#duyệt tất cả các đỉnh kế tiếp
+            cost_to_next = matrix[current][nxt] #chi phí đến đỉnh kế tiếp
+            if cost_to_next == float("inf"): #nếu không có đường
+                continue #bỏ qua
+            cost_rest, path_rest = visit(nxt, remaining[:i] + remaining[i + 1 :]) #đệ quy tìm kiếm tối ưu
+            total_cost = cost_to_next + cost_rest #tính tổng chi phí
+            if total_cost < best_cost:#nếu chi phí tôi thiểu nhỏ hơn chi phí tối thiểu hiện tại
                 best_cost = total_cost
-                best_path = (nxt,) + path_rest
+                best_path = (nxt,) + path_rest 
         return best_cost, best_path
 
-    total_cost, path = visit(start, all_vertices)
+    total_cost, path = visit(start, all_vertices) 
     return total_cost, [start, *path]
 
 
