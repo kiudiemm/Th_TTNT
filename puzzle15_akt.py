@@ -19,19 +19,19 @@ cols = [ 0, -1, 0, 1 ]
 
 # Tao mot lop hang doi
 class priorityQueue:
-    def __init__(self):
+    def __init__(self):#khởi tạo hàng đợi ưu tiên
         self.heap = []
 
     # Inserting a new key 'key'
-    def push(self, key):
+    def push(self, key):#thêm một phần tử vào hàng đợi ưu tiên
         heappush(self.heap, key)
 
     # funct to remove the element that is min from the Priority Queue
-    def pop(self):
+    def pop(self):#lấy phần tử có giá trị nhỏ nhất khỏi hàng đợi ưu tiên
         return heappop(self.heap)
 
     # funct to check if the Queue is empty or not
-    def empty(self):
+    def empty(self):#kiểm tra xem hàng đợi ưu tiên có rỗng không
         if not self.heap:
             return True
         else:
@@ -62,42 +62,42 @@ class nodes:
     # This func is used in order to form the
     # priority queue based on
     # f = g + h = levels + costs (A* algorithm)
-    def __lt__(self, nxt):
-        f_self = self.levels + self.costs
-        f_nxt = nxt.levels + nxt.costs
-        if f_self != f_nxt:
-            return f_self < f_nxt
-        return self.costs < nxt.costs
+    def __lt__(self, nxt):#so sánh hai node theo giá trị f
+        f_self = self.levels + self.costs#giá trị f của node hiện tại
+        f_nxt = nxt.levels + nxt.costs#giá trị f của node tiếp theo
+        if f_self != f_nxt:#nếu giá trị f của node hiện tại khác giá trị f của node tiếp theo
+            return f_self < f_nxt#trả về True nếu giá trị f của node hiện tại nhỏ hơn giá trị f của node tiếp theo
+        return self.costs < nxt.costs#trả về True nếu giá trị f của node hiện tại nhỏ hơn giá trị f của node tiếp theo
 
 # method to calc. the Manhattan distance heuristic
 # that is the sum of Manhattan distances of all tiles
 # from their final positions
 def calculateCosts(mats, final) -> int:
-    distance = 0
+    distance = 0#khoảng cách Manhattan
     for i in range(n):
         for j in range(n):
-            if mats[i][j] != 0:
+            if mats[i][j] != 0:#nếu ô không phải ô trống
                 # Tim vi tri dich cua manh nay trong final state
-                value = mats[i][j]
-                target_row = (value - 1) // n
-                target_col = (value - 1) % n
-                distance += abs(i - target_row) + abs(j - target_col)
+                value = mats[i][j]#giá trị của ô
+                target_row = (value - 1) // n#vị trí hàng của ô trong trạng thái đích
+                target_col = (value - 1) % n#vị trí cột của ô trong trạng thái đích
+                distance += abs(i - target_row) + abs(j - target_col)#tính khoảng cách Manhattan
     return distance
 
 def newNodes(mats, empty_tile_posi, new_empty_tile_posi,
-            levels, parent, final) -> nodes:
+            levels, parent, final) -> nodes:#tạo một node mới
     # Copying data from the parent matrixes to the present matrixes
-    new_mats = copy.deepcopy(mats)
+    new_mats = copy.deepcopy(mats)#sao chép dữ liệu từ ma trận cha sang ma trận hiện tại
 
     # Moving the tile by 1 position
-    x1 = empty_tile_posi[0]
-    y1 = empty_tile_posi[1]
-    x2 = new_empty_tile_posi[0]
-    y2 = new_empty_tile_posi[1]
-    new_mats[x1][y1], new_mats[x2][y2] = new_mats[x2][y2], new_mats[x1][y1]
+    x1 = empty_tile_posi[0]#vị trí hàng của ô trống trong trạng thái hiện tại
+    y1 = empty_tile_posi[1]#vị trí cột của ô trống trong trạng thái hiện tại
+    x2 = new_empty_tile_posi[0]#vị trí hàng của ô trống trong trạng thái mới
+    y2 = new_empty_tile_posi[1]#vị trí cột của ô trống trong trạng thái mới
+    new_mats[x1][y1], new_mats[x2][y2] = new_mats[x2][y2], new_mats[x1][y1]#hoán đổi vị trí của ô trống trong trạng thái hiện tại và trạng thái mới
 
     # Setting the heuristic cost (Manhattan distance)
-    costs = calculateCosts(new_mats, final)
+    costs = calculateCosts(new_mats, final)#tính khoảng cách Manhattan
 
     new_nodes = nodes(parent, new_mats, new_empty_tile_posi,
                     costs, levels)
@@ -115,8 +115,8 @@ def printMatrix(mats):
 
 # func to know if (x, y) is a valid or invalid
 # matrix coordinates
-def isSafe(x, y):
-    return x >= 0 and x < n and y >= 0 and y < n
+def isSafe(x, y):#kiểm tra xem vị trí (x, y) có hợp lệ không
+    return x >= 0 and x < n and y >= 0 and y < n#trả về True nếu vị trí (x, y) hợp lệ, False nếu không
 
 # Printing the path from the root node to the final node
 def printPath(root):

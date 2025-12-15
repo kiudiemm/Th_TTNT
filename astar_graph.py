@@ -11,26 +11,26 @@ if sys.platform == 'win32':
 
 
 class Graph:
-    def __init__(self, adjac_lis):
+    def __init__(self, adjac_lis): #thiết lập đồ thị
         self.adjac_lis = adjac_lis
         # Dictionary luu toa do cac dinh (neu co) cho heuristic
         self.positions = {}
 
-    def get_neighbors(self, v):
-        return self.adjac_lis[v]
+    def get_neighbors(self, v):#lấy danh sách các đỉnh kề
+        return self.adjac_lis[v] #trả về danh sách các đỉnh kề 
 
     # This is heuristic function which is having equal values for all nodes
     # Co the tuy chinh heuristic function tuy theo bai toan
-    def h(self, n, goal=None):
+    def h(self, n, goal=None): 
         # Neu co goal, tinh Euclidean distance
-        if goal and n in self.positions and goal in self.positions:
-            x1, y1 = self.positions[n]
-            x2, y2 = self.positions[goal]
-            return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+        if goal and n in self.positions and goal in self.positions:#nếu có đích và có tọa độ
+            x1, y1 = self.positions[n] #lấy tọa độ của đihr n
+            x2, y2 = self.positions[goal] #lấy tọa độ của đihr đích
+            return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5 #tính khoảng cách Euclidean
         
         # Neu khong co toa do, tra ve heuristic mac dinh (0)
         # Hoac co the dinh nghia heuristic tuy chinh
-        H = {
+        H = {#dictionary lưu trữ giá trị heuristic cho từng đỉnh nếu không có tọa độ
             'A': 1,
             'B': 1,
             'C': 1,
@@ -45,10 +45,10 @@ class Graph:
             'Z': 1,
             'W': 1
         }
-        return H.get(n, 0)
+        return H.get(n, 0) #trả về giá trị heuristic cho đỉnh n, nếu không có thì trả về 0
 
     def set_position(self, vertex, x, y):
-        """Thiet lap toa do cua dinh de tinh heuristic Euclidean"""
+        """Thiet lap toa do cua dinh de tinh heuristic Euclidean""" #thiết lập tọa độ của đỉnh để tính heuristic Euclidean
         self.positions[vertex] = (x, y)
 
     def a_star_algorithm(self, start, stop):
@@ -56,72 +56,72 @@ class Graph:
         # neighbours haven't all been always inspected, It starts off with the start node
         # And closed_lst is a list of nodes which have been visited
         # and who's neighbors have been always inspected
-        open_lst = set([start])
-        closed_lst = set([])
+        open_lst = set([start]) #danh sách các đỉnh cần duyệt
+        closed_lst = set([]) #danh sách các đỉnh đã duyệt
 
         # poo has present distances from start to all other nodes
         # the default value is +infinity
-        poo = {}
+        poo = {} #khoảng cách từ điềm đầu tới hiện tại
         poo[start] = 0
 
         # par contains an adjac mapping of all nodes
-        par = {}
-        par[start] = start
+        par = {} #dsach các đỉnh kề
+        par[start] = start 
 
         while len(open_lst) > 0:
             n = None
 
             # it will find a node with the lowest value of f() -
-            for v in open_lst:
-                if n == None or poo[v] + self.h(v, stop) < poo[n] + self.h(n, stop):
+            for v in open_lst: #duyệt tất cả các đỉnh trong danh sách các đỉnh cần duyệt
+                if n == None or poo[v] + self.h(v, stop) < poo[n] + self.h(n, stop): #nếu đỉnh n chưa được duyệt hoặc khoảng cách từ điềm đầu tới đỉnh v nhỏ hơn khoảng cách từ điềm đầu tới đỉnh n
                     n = v
 
-            if n == None:
+            if n == None:#nếu không tìm thấy đỉnh nào thì không có đường đi
                 print('Path does not exist!')
                 return None
 
             # if the current node is the stop
             # then we start again from start
-            if n == stop:
+            if n == stop:#nếu đỉnh n là đích
                 reconst_path = []
 
-                while par[n] != n:
+                while par[n] != n:#truy vết đường đi từ đích về điềm đầu
                     reconst_path.append(n)
                     n = par[n]
 
-                reconst_path.append(start)
+                reconst_path.append(start)#thêm điềm đầu vào đường đi
 
-                reconst_path.reverse()
+                reconst_path.reverse()#đảo ngược đường đi
 
-                print('Path found: {}'.format(reconst_path))
+                print('Path found: {}'.format(reconst_path))#in đường đi
                 print('Total cost: {}'.format(poo[stop]))
                 return reconst_path
 
             # for all the neighbors of the current node do
-            for (m, weight) in self.get_neighbors(n):
+            for (m, weight) in self.get_neighbors(n):#duyệt tất cả các đỉnh kề của đỉnh n
                 # if the current node is not presentin both open_lst and closed_lst
                 # add it to open_lst and note n as it's par
-                if m not in open_lst and m not in closed_lst:
-                    open_lst.add(m)
-                    par[m] = n
-                    poo[m] = poo[n] + weight
+                if m not in open_lst and m not in closed_lst:#nếu đỉnh m kh nằm trong danh sách các đỉnh cần duyệt và danh sách các đỉnh đã duyệt
+                    open_lst.add(m)#thêm đỉnh m vào danh sách các đỉnh cần duyệt
+                    par[m] = n#lưu đỉnh n làm đỉnh cha của đỉnh m
+                    poo[m] = poo[n] + weight#lưu khoảng cách từ điềm đầu tới đỉnh m
 
                 # otherwise, check if it's quicker to first visit n, then m
                 # and if it is, update par data and poo data
                 # and if the node was in the closed_lst, move it to open_lst
                 else:
-                    if poo[m] > poo[n] + weight:
+                    if poo[m] > poo[n] + weight:#nếu khoảng cách từ điềm đầu tới đỉnh m lớn hơn khoảng cách từ điềm đầu tới đỉnh n cộng với trọng số cạnh nối đỉnh n và đỉnh m
                         poo[m] = poo[n] + weight
-                        par[m] = n
+                        par[m] = n#lưu đỉnh n làm đỉnh cha của đỉnh m
 
                         if m in closed_lst:
-                            closed_lst.remove(m)
-                            open_lst.add(m)
+                            closed_lst.remove(m)#xóa đỉnh m khỏi danh sách các đỉnh đã duyệt
+                            open_lst.add(m)#thêm đỉnh m vào danh sách các đỉnh cần duyệt
 
             # remove n from the open_lst, and add it to closed_lst
             # because all of his neighbors were inspected
-            open_lst.remove(n)
-            closed_lst.add(n)
+            open_lst.remove(n)#xóa đỉnh n khỏi danh sách các đỉnh cần duyệt
+            closed_lst.add(n)#thêm đỉnh n vào danh sách các đỉnh đã duyệt
 
         print('Path does not exist!')
         return None
